@@ -1,3 +1,4 @@
+![smallFetch Screenshot](./images/screenshot.png)
 # smallFetch
 
 **smallFetch** is a small, personal project created to learn and experiment with Rust. It's inspired by `neofetch` and displays basic system information in the terminal, but the main goal is to explore Rust programming concepts in a fun way.
