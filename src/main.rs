@@ -185,6 +185,12 @@ fn main() {
     let used_space: u64 = total_space-available_space;
 
 
+    // Cpu Name Model Name
+    let cpu_model_name = Command::new("/bin/bash").arg("-c").arg("grep 'model name' /proc/cpuinfo | uniq").output().expect("Err");
+    let cpu_model_name = String::from_utf8_lossy(&cpu_model_name.stdout).trim().to_string();
+    let cpu_model_name = cpu_model_name.replace("model name", "").replace(":", "");
+    let cpu_model_name = cpu_model_name.trim();
+
 /*    // packages
     let output = Command::new("rpm")
         .args(["-qa"])
@@ -237,6 +243,7 @@ fn main() {
         format!("Username: {}", username),
         format!("Distro: {}", distro_name),
         format!("Kernel: {}", kernel_info_content),
+        format!("Cpu: {}", cpu_model_name),
         format!("Uptime: {}", uptime_contents_str),
         format!("Memory: {}/{} GiB",  round_to_nth_digit(mem_total-mem_available,2), round_to_nth_digit(mem_total,2)),
         format!("Available space: {}/{} GiB", used_space,total_space),
