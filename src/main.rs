@@ -15,21 +15,17 @@ fn round_to_nth_digit(x: f64, digits: usize) -> f64 {
     (x * factor).round() / factor
 }
 
-
-fn get_numbers(string_with_numbers_placeholder:String, mut string_with_numbers:String) -> String{
-    let numbers:[char;10] = ['0', '1','2','3','4','5','6','7','8','9'];
-    for char in string_with_numbers_placeholder.chars()  {
-
-        if numbers.contains(&char){
+fn get_numbers(string_with_numbers_placeholder: String, mut string_with_numbers: String) -> String {
+    let numbers: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    for char in string_with_numbers_placeholder.chars() {
+        if numbers.contains(&char) {
             string_with_numbers.push(char);
         }
-
     }
     string_with_numbers
 }
 
-fn find_memory_entry(file:String, entry_name:&String) -> String{
-
+fn find_memory_entry(file: String, entry_name: &String) -> String {
     // find index of entry searched
     let location_of_entry: usize = file.find(entry_name).expect("Err");
 
@@ -40,9 +36,8 @@ fn find_memory_entry(file:String, entry_name:&String) -> String{
     // save only the entry itself
     entry = &entry[..entry_end_location];
 
-
     let placeholder_for_numbers: String = String::from("");
-    let entry: String = get_numbers(entry.to_string(),placeholder_for_numbers);
+    let entry: String = get_numbers(entry.to_string(), placeholder_for_numbers);
     entry
 }
 
@@ -53,9 +48,14 @@ fn main() {
     // create String to push content to
     let mut memory_contents = String::new();
     // push content to created string
-    match mem_file.expect("REASON").read_to_string(&mut memory_contents){
-        Ok(_) => {},
-        Err(_) =>{println!("Error reading file")},
+    match mem_file
+        .expect("REASON")
+        .read_to_string(&mut memory_contents)
+    {
+        Ok(_) => {}
+        Err(_) => {
+            println!("Error reading file")
+        }
     }
 
     // print content of file
@@ -63,9 +63,9 @@ fn main() {
 
     // find desired entry in string -> convert output to f64 -> kb to gb -> round to nearest 2
     let mut string = String::from("MemTotal");
-    let mem_total: String=find_memory_entry(memory_contents.to_string(),&string);
-    let mut mem_total:f64 = mem_total.parse::<f64>().expect("Err");
-    mem_total = mem_total/1024.0/1024.0;
+    let mem_total: String = find_memory_entry(memory_contents.to_string(), &string);
+    let mut mem_total: f64 = mem_total.parse::<f64>().expect("Err");
+    mem_total = mem_total / 1024.0 / 1024.0;
     mem_total = round_to_nth_digit(mem_total, 5);
 
     // same
@@ -91,46 +91,53 @@ fn main() {
     // create String to push content to
     let mut uptime_contents = String::new();
     // push content to created string
-    match uptime_file.expect("REASON").read_to_string(&mut uptime_contents){
-        Ok(_) => {},
-        Err(_) =>{println!("Error reading file")},
+    match uptime_file
+        .expect("REASON")
+        .read_to_string(&mut uptime_contents)
+    {
+        Ok(_) => {}
+        Err(_) => {
+            println!("Error reading file")
+        }
     }
 
-    let uptime_contents_location = match uptime_contents.find(char::is_whitespace){
+    let uptime_contents_location = match uptime_contents.find(char::is_whitespace) {
         Some(pos) => pos,
-        None => return
-
+        None => return,
     };
 
     uptime_contents = uptime_contents[..uptime_contents_location].to_string();
     let mut uptime_contents_float = uptime_contents.parse::<f64>().expect("Err");
-    uptime_contents_float = uptime_contents_float/60.0;
+    uptime_contents_float = uptime_contents_float / 60.0;
 
-    let uptime_contents_str = if uptime_contents_float > 60.0{
-        uptime_contents_float = uptime_contents_float/60.0;
-        uptime_contents_float = round_to_nth_digit(uptime_contents_float,2);
+    let uptime_contents_str = if uptime_contents_float > 60.0 {
+        uptime_contents_float = uptime_contents_float / 60.0;
+        uptime_contents_float = round_to_nth_digit(uptime_contents_float, 2);
         format!("{} h", uptime_contents_float)
-    }else{
-        uptime_contents_float = round_to_nth_digit(uptime_contents_float,2);
+    } else {
+        uptime_contents_float = round_to_nth_digit(uptime_contents_float, 2);
         format!("{} m", uptime_contents_float)
     };
-
 
     // Kernel Info
     let kernel_info_file = File::open("/proc/sys/kernel/osrelease");
     // create String to push content to
     let mut kernel_info_content = String::new();
     // push content to created string
-    match kernel_info_file.expect("REASON").read_to_string(&mut kernel_info_content){
-        Ok(_) => {},
-        Err(_) =>{println!("Error reading file")},
+    match kernel_info_file
+        .expect("REASON")
+        .read_to_string(&mut kernel_info_content)
+    {
+        Ok(_) => {}
+        Err(_) => {
+            println!("Error reading file")
+        }
     }
 
-    kernel_info_content = kernel_info_content.replace("\n","").replace("\r","");
+    kernel_info_content = kernel_info_content.replace("\n", "").replace("\r", "");
 
-
-// User name
-   /*  let mut user_name_file = File::open("/var/run/utmp").expect("Err");
+    // User name
+    /*  let mut user_name_file = File::open("/var/run/utmp").expect("Err");
     let mut buffer = Vec::new();
 
     user_name_file.read_to_end(&mut buffer).expect("Err"); // Read entire file as bytes
@@ -153,11 +160,12 @@ fn main() {
     }
     */
 
-
-
-    let username = Command::new("/bin/bash").arg("-c").arg("whoami").output().expect("Err");
+    let username = Command::new("/bin/bash")
+        .arg("-c")
+        .arg("whoami")
+        .output()
+        .expect("Err");
     let username = String::from_utf8_lossy(&username.stdout).trim().to_string();
-
 
     let distro_content = fs::read_to_string("/etc/os-release");
 
@@ -172,38 +180,47 @@ fn main() {
     let mut distro_name = String::new();
 
     if let Some(line) = distro_content.lines().find(|l| l.starts_with("NAME=")) {
-        distro_name = line.trim_start_matches("NAME=").trim_matches('"').to_string();
+        distro_name = line
+            .trim_start_matches("NAME=")
+            .trim_matches('"')
+            .to_string();
     }
-
-
 
     // Disk Space
     let disks = Disks::new_with_refreshed_list();
 
-    let total_space: u64 = disks[0].total_space()/1024/1024/1024;
-    let available_space: u64 = disks[0].available_space()/1024/1024/1024;
-    let used_space: u64 = total_space-available_space;
-
+    let total_space: u64 = disks[0].total_space() / 1024 / 1024 / 1024;
+    let available_space: u64 = disks[0].available_space() / 1024 / 1024 / 1024;
+    let used_space: u64 = total_space - available_space;
 
     // Cpu Name Model Name
-    let cpu_model_name = Command::new("/bin/bash").arg("-c").arg("grep 'model name' /proc/cpuinfo | uniq").output().expect("Err");
-    let cpu_model_name = String::from_utf8_lossy(&cpu_model_name.stdout).trim().to_string();
-    let cpu_model_name = cpu_model_name.replace("model name", "").replace(":", "");
-    let cpu_model_name = cpu_model_name.trim();
-
-/*    // packages
-    let output = Command::new("rpm")
-        .args(["-qa"])
+    let cpu_model_name = Command::new("/bin/bash")
+        .arg("-c")
+        .arg("grep 'model name' /proc/cpuinfo | uniq")
         .output()
-        .expect("failed to execute rpm");
+        .expect("Err");
 
-   let package_count =  String::from_utf8_lossy(&output.stdout)
-       .lines()
-       .count();
-*/
+    let cpu_model_name = String::from_utf8_lossy(&cpu_model_name.stdout)
+        .trim()
+        .to_string()
+        .replace("model name", "")
+        .replace(":", "")
+        .trim()
+        .to_string();
+
+    /*    // packages
+        let output = Command::new("rpm")
+            .args(["-qa"])
+            .output()
+            .expect("failed to execute rpm");
+
+       let package_count =  String::from_utf8_lossy(&output.stdout)
+           .lines()
+           .count();
+    */
 
     /*
-    print!("⠀⠀⠀⠀⠀⠀⠀⠀
+        print!("⠀⠀⠀⠀⠀⠀⠀⠀
         ⣀⣴⣦⡄⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⢠⢺⡽⣦⣴⣾⡿⣟⣿⢿⣷⣤⣺⠿⡳⡀⠀ Username: {}
 ⠀⠀⠸⣿⣠⣿⡿⠛⠛⢿⡟⠛⠻⣿⣷⣠⡷⠁⠀ Distro: {}
@@ -215,10 +232,10 @@ fn main() {
 ⠀⣴⠋⢻⣿⣿⣟⣿⡀⠀⠀⢸⣿⢿⣿⣟⡟⢶⣄
 ⠈⢯⡀⠈⠻⢿⣿⡽⣇⠀⢀⡸⢿⣿⡿⠋⠀⣀⠝
 ⠀⠀⠙⠢⠴⠭⠤⠤⠬⠧⠼⠤⠤⠤⠽⠦⠖⠁⠀\n",
-             username.unwrap(), distro_name, kernel_info_content, uptime_contents_str,
-             round_to_nth_digit(mem_total-mem_available,2),round_to_nth_digit(mem_total,2),available_spcae,total_spcae);
-}
-*/
+                 username.unwrap(), distro_name, kernel_info_content, uptime_contents_str,
+                 round_to_nth_digit(mem_total-mem_available,2),round_to_nth_digit(mem_total,2),available_spcae,total_spcae);
+    }
+    */
 
     let ascii_art = vec![
         "        ⣀⣴⣦⡄",
@@ -234,7 +251,6 @@ fn main() {
         "⠀⠀⠙⠢⠴⠭⠤⠤⠬⠧⠼⠤⠤⠤⠽⠦⠖",
     ];
 
-
     // System info variables
 
     // Build info lines from variables
@@ -245,13 +261,20 @@ fn main() {
         format!("Kernel: {}", kernel_info_content),
         format!("Cpu: {}", cpu_model_name),
         format!("Uptime: {}", uptime_contents_str),
-        format!("Memory: {}/{} GiB",  round_to_nth_digit(mem_total-mem_available,2), round_to_nth_digit(mem_total,2)),
-        format!("Available space: {}/{} GiB", used_space,total_space),
+        format!(
+            "Memory: {}/{} GiB",
+            round_to_nth_digit(mem_total - mem_available, 2),
+            round_to_nth_digit(mem_total, 2)
+        ),
+        format!("Available space: {}/{} GiB", used_space, total_space),
         "└──────────────────────────────┘".to_string(),
     ];
 
-
-    let max_width = ascii_art.iter().map(|s| s.chars().count()).max().unwrap_or(0);
+    let max_width = ascii_art
+        .iter()
+        .map(|s| s.chars().count())
+        .max()
+        .unwrap_or(0);
 
     let total_lines = ascii_art.len().max(info_lines.len());
     let info_start = (total_lines - info_lines.len()) / 2;
