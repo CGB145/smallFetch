@@ -18,7 +18,7 @@
 To build and run `smallfetch` from source:
 
 ```bash
-git clone https://github.com/CGB145/small.git
+git clone https://github.com/CGB145/smallfetch.git
 cd smallFetch
 
 # Run directly with Cargo
